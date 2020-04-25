@@ -1,5 +1,6 @@
 ﻿using CrossPlatformCryptographer;
 using System;
+using System.Diagnostics;
 
 namespace CrossPlatformConsoleRunner
 {
@@ -7,21 +8,23 @@ namespace CrossPlatformConsoleRunner
     {
         static void Main(string[] args)
         {
+
+            string appId = Guid.NewGuid().ToString();
             string token = "NotSecureToken";
             Console.WriteLine($"Plain content: {token}");
             try
             {
                 Console.WriteLine("Encypting...");
-                Cryptographer.Encrypt(token).GetAwaiter().GetResult();
+                MacOSSecurityCommand.Add(appId, token);
                 Console.WriteLine("Encrypted");
                 Console.WriteLine("Decypting...");
-                string decryptedToken = Cryptographer.Decrypt(token).GetAwaiter().GetResult();
+                string decryptedToken = MacOSSecurityCommand.Get(appId);
                 Console.WriteLine($"Decypted content: {decryptedToken}");
                 Console.WriteLine("Removing key...");
-                Cryptographer.Remove();
+                MacOSSecurityCommand.Remove(appId);
                 Console.WriteLine("Removed");
                 Console.WriteLine("Decypting...");
-                decryptedToken = Cryptographer.Decrypt(token).GetAwaiter().GetResult();
+                decryptedToken = MacOSSecurityCommand.Get(appId);
                 Console.WriteLine($"Decypted content: {decryptedToken}");
             }
             catch (Exception ex)
