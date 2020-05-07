@@ -36,11 +36,11 @@ namespace CrossPlatformConsoleRunner
                 //readData = LinuxCryptographer.Get(appId);
                 //originalContent = Encoding.UTF8.GetString(readData);
                 //Console.WriteLine($"Decypted content: {originalContent}");
-                MacCryptographer.AddOrUpdate(appId, token);
-                byte[] readData = MacCryptographer.Get(appId);
+                MacKeyChain.AddOrUpdate(appId, token);
+                byte[] readData = MacKeyChain.Get(appId);
                 string originalContent = Encoding.UTF8.GetString(readData);
                 Console.WriteLine($"Decypted content: {originalContent}");
-                MacCryptographer.Remove(appId);
+                MacKeyChain.Remove(appId);
             }
             catch (Exception ex)
             {

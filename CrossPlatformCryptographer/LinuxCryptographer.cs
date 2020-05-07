@@ -1,8 +1,10 @@
 namespace CrossPlatformCryptographer
 {
+    using CrossPlatformCryptographer.NativeLibs;
     using System;
     using System.Runtime.InteropServices;
-    using CrossPlatformCryptographer.Utils;
+    using static CrossPlatformCryptographer.NativeLibs.LinuxNativeLibKeyUtil;
+
     public static class LinuxCryptographer
     {
         private const string ServiceName = "graph_powershell_sdk";
@@ -10,21 +12,21 @@ namespace CrossPlatformCryptographer
         {
             if (plainContent != null && plainContent.Length > 0){
                 string encodedContent = Convert.ToBase64String(plainContent);
-                int key = LibKeyUtils.request_key(KeyTypes.User, $"{ServiceName}:{appId}", ServiceName, (int)KeyringType.KEY_SPEC_USER_SESSION_KEYRING);
+                int key = LinuxNativeLibKeyUtil.request_key(KeyTypes.User, $"{ServiceName}:{appId}", ServiceName, (int)KeyringType.KEY_SPEC_USER_SESSION_KEYRING);
                 if (key == -1)
-                    key = LibKeyUtils.add_key(KeyTypes.User, $"{ServiceName}:{appId}", encodedContent, encodedContent.Length, (int)KeyringType.KEY_SPEC_USER_SESSION_KEYRING);
+                    key = LinuxNativeLibKeyUtil.add_key(KeyTypes.User, $"{ServiceName}:{appId}", encodedContent, encodedContent.Length, (int)KeyringType.KEY_SPEC_USER_SESSION_KEYRING);
                 else
-                    LibKeyUtils.keyctl_update(key, encodedContent, encodedContent.Length);
+                    LinuxNativeLibKeyUtil.keyctl_update(key, encodedContent, encodedContent.Length);
             }
         }
 
         public static byte[] Get(string appId)
         {
-            int key = LibKeyUtils.request_key(KeyTypes.User, $"{ServiceName}:{appId}", ServiceName, (int)KeyringType.KEY_SPEC_USER_SESSION_KEYRING);
+            int key = LinuxNativeLibKeyUtil.request_key(KeyTypes.User, $"{ServiceName}:{appId}", ServiceName, (int)KeyringType.KEY_SPEC_USER_SESSION_KEYRING);
             if (key == -1)
                 return new byte[0];
 
-            long contentLength = LibKeyUtils.keyctl_read_alloc(key, out IntPtr contentPtr);
+            long contentLength = LinuxNativeLibKeyUtil.keyctl_read_alloc(key, out IntPtr contentPtr);
             string content = Marshal.PtrToStringAuto(contentPtr);
             Marshal.FreeHGlobal(contentPtr);
 
@@ -36,11 +38,11 @@ namespace CrossPlatformCryptographer
 
         public static void Remove(string appId)
         {
-            int key = LibKeyUtils.request_key(KeyTypes.User, $"{ServiceName}:{appId}", ServiceName, (int)KeyringType.KEY_SPEC_USER_SESSION_KEYRING);
+            int key = LinuxNativeLibKeyUtil.request_key(KeyTypes.User, $"{ServiceName}:{appId}", ServiceName, (int)KeyringType.KEY_SPEC_USER_SESSION_KEYRING);
             if (key == -1)
                 throw new Exception("Access token not found in cache.");
                 
-            long removedState = LibKeyUtils.keyctl_revoke(key);
+            long removedState = LinuxNativeLibKeyUtil.keyctl_revoke(key);
             if (removedState == -1)
                 throw new Exception("Failed to remove token from cache.");
         }
