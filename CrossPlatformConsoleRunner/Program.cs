@@ -11,8 +11,6 @@ namespace CrossPlatformConsoleRunner
 
             string appId = "4c3cfd28-c898-4900-94e8-a23f78baa0c7";
             string sampleData = "The quick brown fox jumped over the lazy dog.";
-            byte[] token = Encoding.UTF8.GetBytes(sampleData);
-            Console.WriteLine($"Plain content: {token.Length}");
             try
             {
                 //byte[] previousContent = LinuxCryptographer.Get(appId);
@@ -36,17 +34,27 @@ namespace CrossPlatformConsoleRunner
                 //readData = LinuxCryptographer.Get(appId);
                 //originalContent = Encoding.UTF8.GetString(readData);
                 //Console.WriteLine($"Decypted content: {originalContent}");
-                MacKeyChain.AddOrUpdate(appId, token);
-                byte[] readData = MacKeyChain.Get(appId);
-                string originalContent = Encoding.UTF8.GetString(readData);
-                Console.WriteLine($"Decypted content: {originalContent}");
-                MacKeyChain.Remove(appId);
+
+                byte[] readData = null;
+                byte[] token = null;
+                string originalContent = null;
+                for (int i = 0; i < 1000; i++)
+                {
+                    token = Encoding.UTF8.GetBytes($"{sampleData} - {i + 1}");
+                    LinuxCryptographer.AddOrUpdate(appId, token);
+                    readData = LinuxCryptographer.Get(appId);
+                    originalContent = Encoding.UTF8.GetString(readData);
+                    Console.WriteLine($"Decypted content: {originalContent}");
+                }
+                                
+                LinuxCryptographer.Remove(appId);
+                readData = LinuxCryptographer.Get(appId);
+                originalContent = Encoding.UTF8.GetString(readData);
+                Console.WriteLine($"Decypted content: {originalContent}");   
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine($"Device doesn't support secure storage. {ex.Message}");
-
             }
         }
     }

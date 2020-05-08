@@ -43,27 +43,23 @@ namespace CrossPlatformCryptographer.NativeLibs
 
         [System.Security.SuppressUnmanagedCodeSecurity]
         [DllImport("libkeyutils.so.1", CallingConvention = CallingConvention.StdCall)]
-        public static extern int request_key(string type, string description, int dest_keyring);
+        public static extern int request_key(string type, string description, IntPtr callout_info, int dest_keyring);
 
         [System.Security.SuppressUnmanagedCodeSecurity]
         [DllImport("libkeyutils.so.1", CallingConvention = CallingConvention.StdCall)]
-        public static extern int request_key(string type, string description, string callout_info, int dest_keyring);
+        public static extern int keyctl(string action, int key);
 
         [System.Security.SuppressUnmanagedCodeSecurity]
         [DllImport("libkeyutils.so.1", CallingConvention = CallingConvention.StdCall)]
-        public static extern long keyctl(string action, int key);
+        public static extern int keyctl_update(int key, string payload, int plen);
 
         [System.Security.SuppressUnmanagedCodeSecurity]
         [DllImport("libkeyutils.so.1", CallingConvention = CallingConvention.StdCall)]
-        public static extern long keyctl_update(int key, string payload, int plen);
+        public static extern int keyctl_revoke(int key);
 
         [System.Security.SuppressUnmanagedCodeSecurity]
         [DllImport("libkeyutils.so.1", CallingConvention = CallingConvention.StdCall)]
-        public static extern long keyctl_revoke(int key);
-
-        [System.Security.SuppressUnmanagedCodeSecurity]
-        [DllImport("libkeyutils.so.1", CallingConvention = CallingConvention.StdCall)]
-        public static extern long keyctl_read_alloc(int key, out IntPtr buffer);
+        public static extern int keyctl_read_alloc(int key, out IntPtr buffer);
 
 #pragma warning restore SA1300 // restore lowercase function name warning.
     }
